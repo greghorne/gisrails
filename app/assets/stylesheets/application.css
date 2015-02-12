@@ -13,6 +13,9 @@
  *= require_tree .
  *= require_self
  *= require leaflet
-//= depend_on_asset "layers.png"
-//= depend_on_asset "layers-2x.png"
+ *= require Control.Loading
+ *= require leaflet.draw
+ *= require alertify
+ *= depend_on_asset "layers.png"
+ *= depend_on_asset "layers-2x.png"
  */

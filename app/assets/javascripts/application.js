@@ -14,4 +14,9 @@
 //= require jquery_ujs
 //= require turbolinks
 //= require leaflet
+//= require Control.Loading
+//= require OSMBuildings-Leaflet
+//= require Google
+//= require leaflet.draw-src
+//= require alertify
 //= require_tree .
