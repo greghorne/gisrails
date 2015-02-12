@@ -70,7 +70,7 @@
 	    center: [36, -96],
 		zoom: 12,
 		layers: [osm],
-		loadingControl: false
+		loadingControl: true
 	});
 
 	////////////////////////////////////////////
@@ -133,7 +133,11 @@
 	// Initialise the draw control and pass it the FeatureGroup of editable layers
 	var drawControl = new L.Control.Draw({
 	    edit: { featureGroup: tempDrawn }, 
-	    draw: { polyline: { metric: false }}
+	    draw: { polyline: false,
+				marker: false,
+				edit: { edit: false }
+
+			  }
 	});
 
 	map.addControl(drawControl);
@@ -154,18 +158,18 @@
 			console.log(layer._latlng.lat, layer._latlng.lng, ("center"))
 			console.log(layer._mRadius, " radius (metres)")
 		}
-		alertify.success("Polygon Created")
-		
-		alertify.confirm("Save " + layerType + "?", function (e) {
 
-			if (e) {
-				console.log("Save It")
-			} else {
-				console.log("Delete It")
-			}
-		})
+		alertify.success(layerType + " created")
+		// alertify.confirm("Save " + layerType + "?", function (e) {
 
-		// alertify.error("Error")
+		// 	if (e) {
+		// 		console.log("Save It")
+		// 	} else {
+		// 		console.log("Delete It")
+		// 	}
+		// })
+
+		//alertify.error("Error")
 		
 	})
 	////////////////////////////////////////////
