@@ -12,9 +12,17 @@
 				width: 100%;
 		}
 		#map { height: 100%; }
+		.geocodeControl {
+			position: absolute;
+			top: 5%;
+  			left: 100%;
+		}
 	</style>
 </head>
-<div id='map'></div>
+<body>
+<div id='map'>
+	<input type='textbox'></input>
+</div>
 
 <script type="text/javascript">
 
@@ -63,12 +71,50 @@
 	//censusBlockGroups.addTo(map);
 	////////////////////////////////////////////
 
+	////////////////////////////////////////////
+	// set intial lat, long to center of the U.S.
+	var latitude = 35.746512259918504
+	var longitude = -96.9873046875
+	var zoom = 4
+	////////////////////////////////////////////
+
+	////////////////////////////////////////////
+	// determine geolocation of user
+	var options = { timeout: 7000 };
+
+	function success(location) {
+
+		var latitude = location.coords.latitude;
+		var longitude = location.coords.longitude;
+
+		var myLatLng = L.latLng(location.coords.latitude, location.coords.longitude);
+		map.setView(myLatLng, 14)
+
+		////////////////////////////////////////////
+		// add marker to map for initial location
+		L.marker([latitude, longitude], {
+			bounceOnAdd: true, 
+			bounceOnAddOptions: { duration: 3000, height: 700 }
+		}).addTo(map).bindPopup('<center>Your approximate location<br>(More or less ' + location.coords.accuracy + '  metres)</center>');
+
+		////////////////////////////////////////////
+
+
+	};
+
+	function error(error) {
+		console.log(error)
+	}
+
+	navigator.geolocation.getCurrentPosition(success, error, options)
+	////////////////////////////////////////////
+
 
 	////////////////////////////////////////////
 	// init map, corresponds to map container(div id = map)
 	var map = L.map('map', {
-	    center: [36, -96],
-		zoom: 12,
+	    center: [latitude, longitude],
+		zoom: zoom,
 		layers: [osm],
 		loadingControl: true
 	});
@@ -87,7 +133,7 @@
 	// add layer control tool to map
 	var baseMaps = {
 		'Open Street Map': osm,
-		'Black & White Map': blackAndWhite,
+		'Monochrome Map': blackAndWhite,
 		'Google Roadmap': googleRoadmap,
 		'Google Terrain': googleTerrain,
 		'Google Hybrid': googleHybrid
@@ -103,13 +149,36 @@
 	L.control.layers(baseMaps, overLays).addTo(map);
 	////////////////////////////////////////////
 
+	geocodeControl = L.control({position: 'topleft'});
+	geocodeControl.onAdd = function(map) {
+		this._div = L.DomUtil.create('div', 'geocodeControl');
+		this._div.innerHTML = '<input type="text" class="geocode" id="geocode" value="Find Location...">'
+		return this._div;
+	}
+	geocodeControl.addTo(map)
+
+	// var me = document.getElementByID('geocode')
+
+	// document.getElementByID('geocode').addEventListener('mouseover', function () {map.dragging.disable()})
+
+	// document.getElementByID('geocode').addEventListener('onmouseout', function () {map.dragging.enable()})
+
+
+	// function controlOver(e) { map.dragging.disable(); }
+	// function controlNotOver() { map.dragging.enable(); }
+
+	// document.getElementByID("geocode").onmouseover = controlOver();
+	// document.getElementByID("geocode").onmouseout = controlNotOver();
+
+
+
 	////////////////////////////////////////////
 	// this will get the bounds of the map on the initial page load
 	var bounds = map.getBounds();
 	console.log("Initial Bounds: ", bounds);
 	////////////////////////////////////////////
 
-
+	////////////////////////////////////////////
 	// this will subsequently get the bounds of the
 	// map on further map changes
 	map.on('moveend', function (e) {
@@ -160,23 +229,12 @@
 		}
 
 		alertify.success(layerType + " created")
-		// alertify.confirm("Save " + layerType + "?", function (e) {
-
-		// 	if (e) {
-		// 		console.log("Save It")
-		// 	} else {
-		// 		console.log("Delete It")
-		// 	}
-		// })
-
-		//alertify.error("Error")
 		
 	})
 	////////////////////////////////////////////
 </script>
-<body>
 
-<%= yield %>
+
 
 </body>
 </html>

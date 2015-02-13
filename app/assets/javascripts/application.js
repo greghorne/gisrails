@@ -19,4 +19,5 @@
 //= require Google
 //= require leaflet.draw-src
 //= require alertify
+//= require bouncemaker
 //= require_tree .
