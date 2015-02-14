@@ -12,19 +12,24 @@
 				width: 100%;
 		}
 		#map { height: 100%; }
-		.geocodeControl {
+/*		.geocodeControl {
 			position: absolute;
 			top: 5%;
   			left: 100%;
+		}*/
+		#geocodeControl {
+			margin: auto 0; /*centered x and y*/
 		}
 	</style>
 </head>
 <body>
 <div id='map'>
-	<input type='textbox'></input>
+	<!-- <input type='textbox'></input> -->
 </div>
 
 <script type="text/javascript">
+
+	var marker;
 
 	////////////////////////////////////////////
 	// init osm map layer
@@ -80,26 +85,22 @@
 
 	////////////////////////////////////////////
 	// determine geolocation of user
-	var options = { timeout: 7000 };
+	var options = { timeout: 15000 };
 
 	function success(location) {
 
 		var latitude = location.coords.latitude;
 		var longitude = location.coords.longitude;
 
+		// pan and zoom to location
 		var myLatLng = L.latLng(location.coords.latitude, location.coords.longitude);
-		map.setView(myLatLng, 14)
+		map.setView(myLatLng, 16)
 
-		////////////////////////////////////////////
 		// add marker to map for initial location
-		L.marker([latitude, longitude], {
+		marker = L.marker([latitude, longitude], {
 			bounceOnAdd: true, 
 			bounceOnAddOptions: { duration: 3000, height: 700 }
 		}).addTo(map).bindPopup('<center>Your approximate location<br>(More or less ' + location.coords.accuracy + '  metres)</center>');
-
-		////////////////////////////////////////////
-
-
 	};
 
 	function error(error) {
@@ -149,28 +150,78 @@
 	L.control.layers(baseMaps, overLays).addTo(map);
 	////////////////////////////////////////////
 
+	////////////////////////////////////////////
+	// add geocode input box and listeners
+	// that prevent map manipulation while
+	// mouseover of the input box
+
+
+	function geocodeAddress() {
+
+		var geocodeText = document.getElementById('geocode').value;
+		console.log(geocodeText)
+
+		geocoder = new google.maps.Geocoder()
+		geocoder.geocode( { 'address': geocodeText}, function(results, status) {
+			console.log(status)
+			if (status == "OK") {
+				console.log(results)
+				var longitude = results[0].geometry.location.B
+				var latitude = results[0].geometry.location.k
+				//console.log(latitude, longitude)
+
+				var myLatLng = L.latLng(latitude, longitude);
+				
+				map.setView(myLatLng, 16)
+				var foundAddress = results[0].formatted_address;
+
+				// add marker to map
+				map.removeLayer(marker)
+				marker = L.marker([latitude, longitude], {
+					bounceOnAdd: true, 
+					bounceOnAddOptions: { duration: 3000, height: 700 }
+				}).addTo(map).bindPopup('<center>' + foundAddress + '</center>');
+
+				alertify.success("Geocoded: " + foundAddress)
+			} else {
+				alertify.error("Unable to geocode")
+			}
+
+
+		})
+		//https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA
+		console.log("trace")
+
+	};
+
 	geocodeControl = L.control({position: 'topleft'});
 	geocodeControl.onAdd = function(map) {
 		this._div = L.DomUtil.create('div', 'geocodeControl');
-		this._div.innerHTML = '<input type="text" class="geocode" id="geocode" value="Find Location...">'
+		this._div.innerHTML = '<input type="text" class="geocode" id="geocode" value="Search Location...">'
+
+		// add listeners
+		this._div.addEventListener('mouseover', function () {
+			map.dragging.disable(), map.touchZoom.disable(),
+			map.scrollWheelZoom.disable(), map.doubleClickZoom.disable()
+		});
+
+		this._div.addEventListener('mouseout', function () {
+			map.dragging.enable(), map.touchZoom.enable(),
+			map.scrollWheelZoom.enable(), map.doubleClickZoom.enable()
+
+		});
+
+		this._div.addEventListener('keypress', function() {
+			if (event.keyCode == 13) {
+				console.log(event)
+				geocodeAddress();
+			}
+		});
+
 		return this._div;
 	}
 	geocodeControl.addTo(map)
-
-	// var me = document.getElementByID('geocode')
-
-	// document.getElementByID('geocode').addEventListener('mouseover', function () {map.dragging.disable()})
-
-	// document.getElementByID('geocode').addEventListener('onmouseout', function () {map.dragging.enable()})
-
-
-	// function controlOver(e) { map.dragging.disable(); }
-	// function controlNotOver() { map.dragging.enable(); }
-
-	// document.getElementByID("geocode").onmouseover = controlOver();
-	// document.getElementByID("geocode").onmouseout = controlNotOver();
-
-
+	////////////////////////////////////////////
 
 	////////////////////////////////////////////
 	// this will get the bounds of the map on the initial page load
