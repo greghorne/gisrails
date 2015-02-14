@@ -33,12 +33,12 @@
 
 	////////////////////////////////////////////
 	// init osm map layer
-	var attributionOSM = '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors';
+	var attributionOSM = '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors';
 	////////////////////////////////////////////
 
 	////////////////////////////////////////////
 	// init osm map layer
-	var osm = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+	var osm = L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 	    attribution: attributionOSM,
 	    subdomains: ['a', 'b', 'c']
 	})
@@ -47,7 +47,7 @@
 	////////////////////////////////////////////
 	// init black and white map layer
 	var blackAndWhite = L.tileLayer(
-	    'http://{s}.www.toolserver.org/tiles/bw-mapnik/{z}/{x}/{y}.png', {
+	    'https://{s}.www.toolserver.org/tiles/bw-mapnik/{z}/{x}/{y}.png', {
 	    attribution: attributionOSM,
 	    subdomains: ['a', 'b', 'c']
 	});
@@ -63,7 +63,7 @@
 
 	////////////////////////////////////////////
 	// init census block map layer		
-	var censusBlockGroups = new L.TileLayer.WMS("http://tigerweb.geo.census.gov/arcgis/services/TIGERweb/tigerWMS_Census2010/MapServer/WMSServer",
+	var censusBlockGroups = new L.TileLayer.WMS("https://tigerweb.geo.census.gov/arcgis/services/TIGERweb/tigerWMS_Census2010/MapServer/WMSServer",
 	{
 	  layers: 'Census Block Groups',
 	  format: 'image/png',
