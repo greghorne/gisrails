@@ -6,7 +6,12 @@
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
   <script src="https://maps.google.com/maps/api/js?v=3&sensor=false"></script>
+	<script src="http://js.api.here.com/v3/3.0/mapsjs-core.js"
+          	type="text/javascript" charset="utf-8"></script>
+          <script src="http://js.api.here.com/v3/3.0/mapsjs-service.js"
+          	type="text/javascript" charset="utf-8"></script>  
 	<style type="text/css">
+	
 	 	html, body {
 				height: 100%;
 				width: 100%;
@@ -29,7 +34,82 @@
 
 <script type="text/javascript">
 
-	var marker;
+
+	// www.here.com
+	// App_Id
+	// hQG4ZX6W0D2sUfQJeb0t
+
+	// App_Code
+	// R82WCNW4u11a93myPTaMpg
+
+// 	var marker;
+
+// 	// www.here.com geo server
+// 	var isoPlatform = new H.service.Platform({
+// 		'app_id': 'hQG4ZX6W0D2sUfQJeb0t',
+// 		'app_code': 'R82WCNW4u11a93myPTaMpg'
+// 	});
+
+// 	var isoParameters = {
+// 		'mode': 'fastest;car',
+// 		'start': 'geo!35,-97',
+// 		'time': 'PT0H15M'
+// 	};
+
+// 	var onResult = function(result) {
+// 		console("IsoResult")
+// 		//console.log(result.Response.isolines[0].value)
+// 	};
+
+// 	var enterpriseRouter = isoPlatform.getEnterpriseRoutingService();
+// console.log("enterpriseRouter", enterpriseRouter)
+// debugger
+// 	enterpriseRouter.calculateIsoline(
+// 		isoParameters,
+// 		onResult,
+// 		function(error) {
+// 			console.log(error)
+// 			alertify.error(error.message);
+// 		}
+// 	);
+
+//https://route.st.nlp.nokia.com/routing/6.2/calculateisoline.json?mode=fastest;car;traffic:disabled&start=36,-97&time=PT0H15M&app_id=hQG4ZX6W0D2sUfQJeb0t&app_code=R82WCNW4u11a93myPTaMpg
+
+	
+
+
+	// https://route.st.nlp.nokia.com/routing/6.2/calculateisoline.json?mode=fastest;car;traffic:disabled&start=35,-97 &time=PT0H05M&app_id=hQG4ZX6W0D2sUfQJeb0t&app_code=R82WCNW4u11a93myPTaMpg
+
+function createIsochrone() {
+		$.ajax({
+    	url: 'https://route.st.nlp.nokia.com/routing/6.2/calculateisoline.json',
+    	type: 'GET',
+    	datatype: 'jsonp',
+    	data: 'mode=fastest;car;traffic:disabled&start=30.451005399999996, -97.6132245&time=PT0H10M&app_id=hQG4ZX6W0D2sUfQJeb0t&app_code=R82WCNW4u11a93myPTaMpg'
+	}).done (function (result) {
+
+		// number of point in isoChrone
+		length = result.Response.isolines[0].value.length
+
+		var isoChronePoints = [];
+		for (n= 0; n < length - 1; n++) {
+
+			valueSplit = result.Response.isolines[0].value[n].split(",")
+			isoChronePoints.push(L.latLng(valueSplit[0], valueSplit[1]))
+		}
+		var isoChrone = L.polygon(isoChronePoints, {color: 'green'}).addTo(map);
+
+		// zoom the map to the polyline
+		map.fitBounds(isoChrone.getBounds());
+
+		alertify.success("Drive Time Polygon Created")
+
+	});
+};
+
+
+
+
 
 	////////////////////////////////////////////
 	// init osm map layer
@@ -94,7 +174,7 @@
 
 		// pan and zoom to location
 		var myLatLng = L.latLng(location.coords.latitude, location.coords.longitude);
-		map.setView(myLatLng, 16)
+		map.setView(myLatLng, 12)   // change to 16
 
 		// add marker to map for initial location
 		marker = L.marker([latitude, longitude], {
@@ -149,7 +229,7 @@
 	// create the layer control widget on the map
 	L.control.layers(baseMaps, overLays).addTo(map);
 	////////////////////////////////////////////
-
+createIsochrone();
 	////////////////////////////////////////////
 	// add geocode input box and listeners
 	// that prevent map manipulation while
@@ -283,6 +363,7 @@
 		
 	})
 	////////////////////////////////////////////
+
 </script>
 
 
