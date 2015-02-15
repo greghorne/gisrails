@@ -36,7 +36,8 @@
 
 
 
-// 	var marker;
+var marker;
+var isoChrone;
 
 
 var isoChrone = []
@@ -44,7 +45,7 @@ isoChrone.push("")
 isoChrone.push("")
 isoChrone.push("")
 
-function createIsochrone(latitude, longitude, time, color, setBounds) {
+function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLayer) {
 		$.ajax({
     	url: 'https://route.st.nlp.nokia.com/routing/6.2/calculateisoline.json',
     	type: 'GET',
@@ -63,7 +64,8 @@ function createIsochrone(latitude, longitude, time, color, setBounds) {
 			valueSplit = result.Response.isolines[0].value[n].split(",")
 			isoChronePoints.push(L.latLng(valueSplit[0], valueSplit[1]))
 		}
-		var isoChrone = L.polygon(isoChronePoints, color).addTo(map);
+		isoChrone = L.polygon(isoChronePoints, color).addTo(map);
+
 
 		// zoom the map to the polygon
 		if (setBounds) { 
@@ -150,10 +152,15 @@ function createIsochrone(latitude, longitude, time, color, setBounds) {
 		// map.removeLayer(userLayer)
 		// var userLayer = new L.FeatureGroup()
 		// map.addLayer(userLayer);
+		// alert(map.hasLayer(isoChrone))
+		if (map.hasLayer(isoChrone)) { 
+			console.log("IsoLayer Removed")
+			map.removeLayer(isoChrone) 
+		};
 
-		createIsochrone(latitude, longitude, "PT0H10M", {color: 'red'}, true)
-		createIsochrone(latitude, longitude, "PT0H8M", {color: 'blue'}, false)
-		createIsochrone(latitude, longitude, "PT0H5M", {color: 'green'}, false)
+		createIsochrone(latitude, longitude, "PT0H10M", {color: 'red'}, true, true)
+		// createIsochrone(latitude, longitude, "PT0H8M", {color: 'blue'}, false, false)
+		// createIsochrone(latitude, longitude, "PT0H5M", {color: 'green'}, false, false)
 		alertify.success("Drive Time Polygons Created")
 	};
 
@@ -244,10 +251,14 @@ function createIsochrone(latitude, longitude, time, color, setBounds) {
 		// map.removeLayer(userLayer)
 		// var userLayer = new L.FeatureGroup()
 		// map.addLayer(userLayer);
-
-				createIsochrone(latitude, longitude, "PT0H10M", {color: 'red'}, true)
-				createIsochrone(latitude, longitude, "PT0H8M", {color: 'blue'}, false)
-				createIsochrone(latitude, longitude, "PT0H5M", {color: 'green'}, false)
+		// alert(map.hasLayer(isoChrone))
+		if (map.hasLayer(isoChrone)) { 
+			console.log("IsoLayer Removed")
+			map.removeLayer(isoChrone) 
+		};
+				createIsochrone(latitude, longitude, "PT0H10M", {color: 'red'}, true, true)
+				// createIsochrone(latitude, longitude, "PT0H8M", {color: 'blue'}, false, false)
+				// createIsochrone(latitude, longitude, "PT0H5M", {color: 'green'}, false, false)
 				alertify.success("Drive Time Polygons Created")
 			} else {
 				alertify.error("Unable to geocode")
@@ -320,7 +331,6 @@ function createIsochrone(latitude, longitude, time, color, setBounds) {
 	var drawControl = new L.Control.Draw({
 	    edit: { featureGroup: tempDrawn }, 
 	    draw: { polyline: false,
-				marker: false,
 				edit: { edit: false }
 
 			  }
@@ -335,17 +345,44 @@ function createIsochrone(latitude, longitude, time, color, setBounds) {
 		
 		console.log("Layer Type: ", layerType)
 
+			if (map.hasLayer(isoChrone)) { 
+				console.log("IsoLayer Removed")
+				map.removeLayer(isoChrone) 
+			};
+
 		if (["polygon", "rectangle"].indexOf(layerType) >= 0) {	
-			// dump coordinates of polygon
+
+			var isoChronePoints = [];
 			for (n = 0; n < layer._latlngs.length; n++) {
 				console.log(layer._latlngs[n].lat, layer._latlngs[n].lng, "(lat/lng)")
+				isoChronePoints.push(L.latLng(layer._latlngs[n].lat, layer._latlngs[n].lng))
 			}
+			isoChrone = L.polygon(isoChronePoints, {color: 'red'}).addTo(map);
+
 		} else if (layerType === "circle") {
-			console.log(layer._latlng.lat, layer._latlng.lng, ("center"))
-			console.log(layer._mRadius, " radius (metres)")
+			isoChrone = L.circle(L.latLng(layer._latlng.lat, layer._latlng.lng), layer._mRadius).addTo(map)
+		} else if (layerType === "marker") {
+			latitude = e.layer._latlng.lat
+			longitude = e.layer._latlng.lng
+
+			// add marker to map for initial location
+			map.removeLayer(marker)
+
+			marker = L.marker([latitude, longitude], {
+				bounceOnAdd: true, 
+				bounceOnAddOptions: { duration: 3000, height: 700 }
+			}).addTo(map).bindPopup('<center>Location: ' + latitude + ', ' + longitude + ' (lat/lng)</center>');
+
+			if (map.hasLayer(isoChrone)) { 
+				console.log("IsoLayer Removed")
+				map.removeLayer(isoChrone) 
+			};
+
+			createIsochrone(latitude, longitude, "PT0H10M", {color: 'red'}, true, true)
+			alertify.success("Drive Time Polygon Created")
 		}
 
-		alertify.success(layerType + " created")
+		//alertify.success(layerType + " created")
 		
 	})
 	////////////////////////////////////////////
