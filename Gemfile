@@ -26,6 +26,10 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'pry-byebug'
 gem 'pg'
 gem 'leaflet-rails'
+gem 'rest-client'
+gem 'rgeo'
+gem 'rgeo-geojson'
+gem 'json'
 
 gem "rails_12factor", group: :production
 

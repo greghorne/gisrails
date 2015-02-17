@@ -79,6 +79,7 @@ GEM
     mini_portile (0.6.2)
     minitest (5.5.1)
     multi_json (1.10.1)
+    netrc (0.10.2)
     nokogiri (1.6.6.2)
       mini_portile (~> 0.6.0)
     pg (0.18.1)
@@ -123,6 +124,12 @@ GEM
       thor (>= 0.18.1, < 2.0)
     rake (10.4.2)
     rdoc (4.2.0)
+    rest-client (1.7.2)
+      mime-types (>= 1.16, < 3.0)
+      netrc (~> 0.7)
+    rgeo (0.3.20)
+    rgeo-geojson (0.3.1)
+      rgeo (~> 0.3)
     sass (3.4.11)
     sass-rails (5.0.1)
       railties (>= 4.0.0, < 5.0)
@@ -168,11 +175,15 @@ DEPENDENCIES
   coffee-rails (~> 4.1.0)
   jbuilder (~> 2.0)
   jquery-rails
+  json
   leaflet-rails
   pg
   pry-byebug
   rails (= 4.2.0)
   rails_12factor
+  rest-client
+  rgeo
+  rgeo-geojson
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
   spring

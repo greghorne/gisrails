@@ -66,11 +66,26 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 		}
 		isoChrone = L.polygon(isoChronePoints, color).addTo(map);
 
-
 		// zoom the map to the polygon
 		if (setBounds) { 
 			map.fitBounds(isoChrone.getBounds());
 		}
+
+console.log("START")
+
+		var geoJSON = L.polygon(isoChronePoints, color).toGeoJSON()
+		//var geoJSON = L.polygon(isoChronePoints, color)
+		// console.log(JSON.stringify(geoJSON))
+		//console.log(geoJSON)
+geoJSON = JSON.stringify(geoJSON)
+		$.ajax({
+		    url: "/insert_iso_shape.json",
+		    type: "POST",
+		    data: {polygon: geoJSON}
+		}).done(function (data) {
+		    console.log(data)
+		});
+console.log("FINISH")
 	});
 };
 
@@ -383,9 +398,12 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 		}
 
 		//alertify.success(layerType + " created")
+
 		
 	})
 	////////////////////////////////////////////
+
+
 
 </script>
 

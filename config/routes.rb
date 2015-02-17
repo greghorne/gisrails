@@ -5,7 +5,10 @@ Rails.application.routes.draw do
   # See how all your routes lay out with "rake routes".
 
   # You can have the root of your site routed with "root"
- root 'map#show_map'
+  get 'my_coordinates' => 'map#starting_coordinates' 
+  get 'insert_iso' => 'map#insert_iso'
+  post 'insert_iso_shape' => 'map#insert_iso_shape'
+  root 'map#show_map'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
