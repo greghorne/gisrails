@@ -19,6 +19,9 @@ class MapController < ApplicationController
     ########################################################
     # some weird shit to get the geo string setup for insertion
     polygon = params[:polygon].to_json()
+      # puts "=============="
+      # puts polygon
+      # puts "============="
     polygon.slice! "{\\\"type\\\":\\\"Feature\\\",\\\"properties\\\":{},\\\"geometry\\\":"
     polygon = polygon.sub("}}", "}")
     polygon = polygon.gsub("\\", "")
@@ -35,9 +38,21 @@ class MapController < ApplicationController
 
     selectString = 'select geoid10 as block_group_id, (st_area(st_intersection(user_polygons.geom, bg_2010.geom))/st_area(bg_2010.geom)) as user_polygon_percent_overlap from bg_2010, user_polygons where user_polygons.id = $1 and ST_INTERSECTS(user_polygons.geom, bg_2010.geom) order by geoid10;'
     result = conn.query(selectString, [rowID])
+    
+    block_group_id = Array.new
+    block_group_overlap = Array.new
+
     result.each do |row|
-      puts row['block_group_id']
+      #puts row['block_group_id'] + "    " + row['user_polygon_percent_overlap']
+      block_group_id.push(row['block_group_id'])
+      block_group_overlap.push(row['user_polygon_percent_overlap'])
     end
+
+    n = 0
+    while (n < block_group_id.length) do
+      puts block_group_id[n] + "   " + block_group_overlap[n]
+      n = n + 1
+    end 
 
     render :json => {
       connection: row['id']
