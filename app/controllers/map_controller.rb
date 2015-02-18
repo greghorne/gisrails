@@ -27,8 +27,17 @@ class MapController < ApplicationController
 
     insertString = 'insert into user_polygons (name, geom) VALUES ($1, ST_SetSRID(ST_GeomFromGeoJSON($2), 4269)) RETURNING id'
     result = conn.query(insertString, ['Test Insert', polygon])
+
     row = result.first
-    puts row['id']
+    rowID = row['id']
+    puts rowID
+
+
+    selectString = 'select geoid10 as block_group_id, (st_area(st_intersection(user_polygons.geom, bg_2010.geom))/st_area(bg_2010.geom)) as user_polygon_percent_overlap from bg_2010, user_polygons where user_polygons.id = $1 and ST_INTERSECTS(user_polygons.geom, bg_2010.geom) order by geoid10;'
+    result = conn.query(selectString, [rowID])
+    result.each do |row|
+      puts row['block_group_id']
+    end
 
     render :json => {
       connection: row['id']
