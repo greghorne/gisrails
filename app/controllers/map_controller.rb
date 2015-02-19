@@ -41,7 +41,7 @@ puts conn
     puts "==============="
     row = result.first
     rowID = row['id']
-    puts rowID
+    # puts rowID
 
 
     selectString = 'select geoid10 as block_group_id, (st_area(st_intersection(user_polygons.geom, bg_2010.geom))/st_area(bg_2010.geom)) as user_polygon_percent_overlap from bg_2010, user_polygons where user_polygons.id = $1 and ST_INTERSECTS(user_polygons.geom, bg_2010.geom) order by geoid10;'
@@ -57,30 +57,40 @@ puts conn
     end
 
     n = 0
+    totalPopulation = 0
+    totalHousehold = 0
+
     while (n < block_group_id.length) do
       puts block_group_id[n] + "   " + block_group_overlap[n]
+
+      getString = 'http://tigerweb.geo.census.gov/arcgis/rest/services/Census2010/Tracts_Blocks/MapServer/1/'
+      getString = getString + 'query?where=GEOID%3D' + block_group_id[n] + '&text=&objectIds=&time=&geometry=&geometryType=esriGeometryPoint&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=POP100%2C+HU100%2C+BLKGRP&returnGeometry=false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson'
+      response = RestClient.get getString
+      # response = RestClient.get 'http://tigerweb.geo.census.gov/arcgis/rest/services/Census2010/Tracts_Blocks/MapServer/1/query?where=GEOID%3D484910208071&text=&objectIds=&time=&geometry=&geometryType=esriGeometryPoint&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=POP100%2C+HU100%2C+BLKGRP&returnGeometry=false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson'
+      
+      hash = JSON.parse response
+      features = hash["features"]
+      attributes = features[0]
+
+      # puts attributes["attributes"]["POP100"]
+      # puts attributes["attributes"]["HU100"]
+      tempPopulation = attributes["attributes"]["POP100"].to_f * block_group_overlap[n].to_f
+      tempHousehold = attributes["attributes"]["HU100"].to_f * block_group_overlap[n].to_f
+
+      totalPopulation = totalPopulation + tempPopulation
+      totalHousehold = totalHousehold + tempHousehold
+
       n = n + 1
     end 
 
-
-    response = RestClient.get 'http://tigerweb.geo.census.gov/arcgis/rest/services/Census2010/Tracts_Blocks/MapServer/1/query?where=GEOID%3D484910210001&text=&objectIds=&time=&geometry=&geometryType=esriGeometryPoint&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=POP100%2C+HU100%2C+BLKGRP&returnGeometry=false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson'
-    # puts "Response Code: " + response.code.to_s
-    hash = JSON.parse response
-    # puts  hash
-    puts "===================="
-    features = hash["features"]
-    puts "hash================="
-    attributes = features[0]
-    puts attributes["attributes"]["POP100"]
-    puts "hash end================="
-
-    # attributes = features["attributes"]
-    # puts attributes
-    #puts features["attributes"]
-    # puts "#{features['POP100']}"
+    puts "------------"
+    puts "POP " + totalPopulation.to_f.floor.to_s
+    puts "HU " + totalHousehold.to_f.floor.to_s
+    puts "------------"
 
     render :json => {
-      connection: row['id']
+      pop: totalPopulation.floor,
+      hu: totalHousehold.floor
     }
 
   end
