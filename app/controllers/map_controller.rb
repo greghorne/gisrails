@@ -10,12 +10,17 @@ class MapController < ApplicationController
 
   def insert_iso_shape
     conn = PGconn.open(
-      :host => 'aws-gis.cot74qrzzmqu.us-west-2.rds.amazonaws.com',
+      # :host => 'aws-gis.cot74qrzzmqu.us-west-2.rds.amazonaws.com',
+      # :dbname => 'awsgis',
+      :host => 'localhost',
+      :dbname => 'gis',
       :port => 5432,
-      :dbname => 'awsgis',
-      :user => 'master',
-      :password => 'mastermaster')
+      :user => 'greghorne',
+      :password => 'rikkitikki')
+      # :user => 'master',
 
+      # :password => 'mastermaster')
+puts conn
     ########################################################
     # some weird shit to get the geo string setup for insertion
     polygon = params[:polygon].to_json()
@@ -31,6 +36,9 @@ class MapController < ApplicationController
     insertString = 'insert into user_polygons (name, geom) VALUES ($1, ST_SetSRID(ST_GeomFromGeoJSON($2), 4269)) RETURNING id'
     result = conn.query(insertString, ['Test Insert', polygon])
 
+    puts "==============="
+    puts result
+    puts "==============="
     row = result.first
     rowID = row['id']
     puts rowID
@@ -53,6 +61,23 @@ class MapController < ApplicationController
       puts block_group_id[n] + "   " + block_group_overlap[n]
       n = n + 1
     end 
+
+
+    response = RestClient.get 'http://tigerweb.geo.census.gov/arcgis/rest/services/Census2010/Tracts_Blocks/MapServer/1/query?where=GEOID%3D484910210001&text=&objectIds=&time=&geometry=&geometryType=esriGeometryPoint&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=POP100%2C+HU100%2C+BLKGRP&returnGeometry=false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson'
+    # puts "Response Code: " + response.code.to_s
+    hash = JSON.parse response
+    # puts  hash
+    puts "===================="
+    features = hash["features"]
+    puts "hash================="
+    attributes = features[0]
+    puts attributes["attributes"]["POP100"]
+    puts "hash end================="
+
+    # attributes = features["attributes"]
+    # puts attributes
+    #puts features["attributes"]
+    # puts "#{features['POP100']}"
 
     render :json => {
       connection: row['id']
