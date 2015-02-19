@@ -82,7 +82,7 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 			household = data["hu"]
 			// console.log(population)
 			// console.log(household)
-		 //    console.log(data)
+		 	//    console.log(data)
 		    alertify.success("<center>Population: " + population + " </br> Households: " + household + "</center>")
 		});
 	});
@@ -240,7 +240,7 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 			console.log(status)
 			if (status == "OK") {
 				console.log(results)
-				var longitude = results[0].geometry.location.B
+				var longitude = results[0].geometry.location.D
 				var latitude = results[0].geometry.location.k
 				//console.log(latitude, longitude)
 

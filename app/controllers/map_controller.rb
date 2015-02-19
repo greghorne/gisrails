@@ -20,7 +20,7 @@ class MapController < ApplicationController
       # :user => 'master',
 
       # :password => 'mastermaster')
-puts conn
+
     ########################################################
     # some weird shit to get the geo string setup for insertion
     polygon = params[:polygon].to_json()
@@ -36,9 +36,9 @@ puts conn
     insertString = 'insert into user_polygons (name, geom) VALUES ($1, ST_SetSRID(ST_GeomFromGeoJSON($2), 4269)) RETURNING id'
     result = conn.query(insertString, ['Test Insert', polygon])
 
-    puts "==============="
-    puts result
-    puts "==============="
+    # puts "==============="
+    # puts result
+    # puts "==============="
     row = result.first
     rowID = row['id']
     # puts rowID
@@ -46,7 +46,16 @@ puts conn
 
     selectString = 'select geoid10 as block_group_id, (st_area(st_intersection(user_polygons.geom, bg_2010.geom))/st_area(bg_2010.geom)) as user_polygon_percent_overlap from bg_2010, user_polygons where user_polygons.id = $1 and ST_INTERSECTS(user_polygons.geom, bg_2010.geom) order by geoid10;'
     result = conn.query(selectString, [rowID])
-    
+
+    puts result.count.to_s + " Block Groups "
+
+    if (result.count == 0)
+      render :json => {
+        pop: 0,
+        hu: 0
+    }
+    end
+
     block_group_id = Array.new
     block_group_overlap = Array.new
 
@@ -61,7 +70,7 @@ puts conn
     totalHousehold = 0
 
     while (n < block_group_id.length) do
-      puts block_group_id[n] + "   " + block_group_overlap[n]
+      puts "Record: " + n.to_s + "   Block Group ID: " + block_group_id[n] + "   Percent Overlap: " + block_group_overlap[n]
 
       getString = 'http://tigerweb.geo.census.gov/arcgis/rest/services/Census2010/Tracts_Blocks/MapServer/1/'
       getString = getString + 'query?where=GEOID%3D' + block_group_id[n] + '&text=&objectIds=&time=&geometry=&geometryType=esriGeometryPoint&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=POP100%2C+HU100%2C+BLKGRP&returnGeometry=false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson'

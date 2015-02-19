@@ -9,10 +9,10 @@ default: &default
   port: 5432
   pool: 5
   timeout: 5000
-  database: awsgis 
-  host: aws-gis.cot74qrzzmqu.us-west-2.rds.amazonaws.com
-  user: master
-  password: mastermaster
+  database: gis 
+  # host: aws-gis.cot74qrzzmqu.us-west-2.rds.amazonaws.com
+  # user: master
+  # password: mastermaster
 
 development:
   <<: *default
