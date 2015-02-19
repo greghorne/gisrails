@@ -78,13 +78,15 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 		    type: "POST",
 		    data: {polygon: geoJSON}
 		}).done(function (data) {
-		    console.log(data)
+			population = data["pop"]
+			household = data["hu"]
+			// console.log(population)
+			// console.log(household)
+		 //    console.log(data)
+		    alertify.success("<center>Population: " + population + " </br> Households: " + household + "</center>")
 		});
 	});
 };
-
-
-
 
 
 	////////////////////////////////////////////
@@ -167,7 +169,7 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 			map.removeLayer(isoChrone) 
 		};
 
-		createIsochrone(latitude, longitude, "PT0H10M", {color: 'red'}, true, true)
+		createIsochrone(latitude, longitude, "PT0H05M", {color: 'red'}, true, true)
 		// createIsochrone(latitude, longitude, "PT0H8M", {color: 'blue'}, false, false)
 		// createIsochrone(latitude, longitude, "PT0H5M", {color: 'green'}, false, false)
 		alertify.success("Drive Time Polygons Created")
@@ -265,7 +267,7 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 			console.log("IsoLayer Removed")
 			map.removeLayer(isoChrone) 
 		};
-				createIsochrone(latitude, longitude, "PT0H10M", {color: 'red'}, true, true)
+				createIsochrone(latitude, longitude, "PT0H05M", {color: 'red'}, true, true)
 				// createIsochrone(latitude, longitude, "PT0H8M", {color: 'blue'}, false, false)
 				// createIsochrone(latitude, longitude, "PT0H5M", {color: 'green'}, false, false)
 				alertify.success("Drive Time Polygons Created")
@@ -376,7 +378,9 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 			    type: "POST",
 			    data: {polygon: geoJSON}
 			}).done(function (data) {
-			    console.log(data)
+				population = data["pop"]
+				household = data["hu"]
+			    alertify.success("<center>Population: " + population + " </br> Households: " + household + "</center>")
 			});
 			/////////////////////////
 
@@ -400,7 +404,7 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 				map.removeLayer(isoChrone) 
 			};
 
-			createIsochrone(latitude, longitude, "PT0H10M", {color: 'red'}, true, true)
+			createIsochrone(latitude, longitude, "PT0H05M", {color: 'red'}, true, true)
 			alertify.success("Drive Time Polygon Created")
 		}
 
