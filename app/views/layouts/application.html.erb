@@ -17,11 +17,7 @@
 				width: 100%;
 		}
 		#map { height: 100%; }
-/*		.geocodeControl {
-			position: absolute;
-			top: 5%;
-  			left: 100%;
-		}*/
+
 		#geocodeControl {
 			margin: auto 0; /*centered x and y*/
 		}
@@ -80,9 +76,7 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 		}).done(function (data) {
 			population = data["pop"]
 			household = data["hu"]
-			// console.log(population)
-			// console.log(household)
-		 	//    console.log(data)
+
 		    alertify.success("<center>Population: " + population + " </br> Households: " + household + "</center>")
 		});
 	});
@@ -127,7 +121,6 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 	  format: 'image/png',
 	  transparent: true,
 	  detectRetina: true,
-	  //unloadInvisibleTiles: true,
 	  reuseTiles: true,
 	  // attribution: TigerAttribution
 	});
@@ -160,18 +153,13 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 			bounceOnAddOptions: { duration: 3000, height: 700 }
 		}).addTo(map).bindPopup('<center>Your approximate location<br>(More or less ' + location.coords.accuracy + '  metres)</center>');
 
-		// map.removeLayer(userLayer)
-		// var userLayer = new L.FeatureGroup()
-		// map.addLayer(userLayer);
-		// alert(map.hasLayer(isoChrone))
 		if (map.hasLayer(isoChrone)) { 
 			console.log("IsoLayer Removed")
 			map.removeLayer(isoChrone) 
 		};
 
 		createIsochrone(latitude, longitude, "PT0H05M", {color: 'red'}, true, true)
-		// createIsochrone(latitude, longitude, "PT0H8M", {color: 'blue'}, false, false)
-		// createIsochrone(latitude, longitude, "PT0H5M", {color: 'green'}, false, false)
+
 		alertify.success("Drive Time Polygons Created")
 	};
 
@@ -259,27 +247,18 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 
 				alertify.success("Geocoded: " + foundAddress)
 
-		// map.removeLayer(userLayer)
-		// var userLayer = new L.FeatureGroup()
-		// map.addLayer(userLayer);
-		// alert(map.hasLayer(isoChrone))
+
 		if (map.hasLayer(isoChrone)) { 
 			console.log("IsoLayer Removed")
 			map.removeLayer(isoChrone) 
 		};
 				createIsochrone(latitude, longitude, "PT0H05M", {color: 'red'}, true, true)
-				// createIsochrone(latitude, longitude, "PT0H8M", {color: 'blue'}, false, false)
-				// createIsochrone(latitude, longitude, "PT0H5M", {color: 'green'}, false, false)
+
 				alertify.success("Drive Time Polygons Created")
 			} else {
 				alertify.error("Unable to geocode")
 			}
-
-
 		})
-		//https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA
-		console.log("trace")
-
 	};
 
 	geocodeControl = L.control({position: 'topleft'});
@@ -407,18 +386,11 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 			createIsochrone(latitude, longitude, "PT0H05M", {color: 'red'}, true, true)
 			alertify.success("Drive Time Polygon Created")
 		}
-
-		//alertify.success(layerType + " created")
-
-		
 	})
 	////////////////////////////////////////////
 
 
 
 </script>
-
-
-
 </body>
 </html>
