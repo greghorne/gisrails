@@ -6,10 +6,22 @@
 #
 default: &default
   adapter: postgresql
+  host: aws-gis.cot74qrzzmqu.us-west-2.rds.amazonaws.com
+  dbname: awsgis
   port: 5432
-  pool: 5
-  timeout: 5000
-  database: gis 
+  user: master
+  password: mastermaster
+
+  # host: aws-gis.cot74qrzzmqu.us-west-2.rds.amazonaws.com
+  # user: master
+  # password: mastermaster
+# :host => 'localhost',
+# :dbname => 'gis',
+  #adapter: postgresql
+  # port: 5432
+  # pool: 5
+  # timeout: 5000
+  # database: gis 
   # host: aws-gis.cot74qrzzmqu.us-west-2.rds.amazonaws.com
   # user: master
   # password: mastermaster

@@ -11,13 +11,13 @@ class MapController < ApplicationController
 
   def insert_iso_shape
     conn = PGconn.open(
-      # :host => 'aws-gis.cot74qrzzmqu.us-west-2.rds.amazonaws.com',
-      # :dbname => 'awsgis',
-      :host => 'localhost',
-      :dbname => 'gis',
+      :host => 'aws-gis.cot74qrzzmqu.us-west-2.rds.amazonaws.com',
+      :dbname => 'awsgis',
+      # :host => 'localhost',
+      # :dbname => 'gis',
       :port => 5432,
-      :user => 'greghorne',
-      :password => 'rikkitikki')
+      :user => 'master',
+      :password => 'mastermaster')
       # :user => 'master',
 
       # :password => 'mastermaster')

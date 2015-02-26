@@ -30,6 +30,7 @@ gem 'rest-client'
 gem 'rgeo'
 gem 'rgeo-geojson'
 gem 'json'
+gem 'eventmachine'
 
 gem "rails_12factor", group: :production
 
