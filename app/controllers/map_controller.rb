@@ -20,12 +20,11 @@ class MapController < ApplicationController
       :password => 'mastermaster')
 
     ########################################################
-    # some weird shit to get the geo string setup for insertion
+    # having to strip some characters from GeoJSON string prior
+    # to insert into DB
     #
     polygon = params[:polygon].to_json()
 
-    polygon.slice! "{\\\"type\\\":\\\"Feature\\\",\\\"properties\\\":{},\\\"geometry\\\":"
-    polygon = polygon.sub("}}", "}")
     polygon = polygon.gsub("\\", "")
     polygon.chop!
     polygon[0] = ''
@@ -52,7 +51,6 @@ class MapController < ApplicationController
     block_group_overlap = Array.new
 
     result.each do |row|
-      #puts row['block_group_id'] + "    " + row['user_polygon_percent_overlap']
       block_group_id.push(row['block_group_id'])
       block_group_overlap.push(row['user_polygon_percent_overlap'])
     end
@@ -65,7 +63,6 @@ class MapController < ApplicationController
     while (n < block_group_id.length) do
       puts "Record: " + n.to_s + "   Block Group ID: " + block_group_id[n] + "   Percent Overlap: " + block_group_overlap[n]
 
-
       getString = 'http://tigerweb.geo.census.gov/arcgis/rest/services/Census2010/Tracts_Blocks/MapServer/1/'
       getString = getString + 'query?where=GEOID%3D' + block_group_id[n] + '&text=&objectIds=&time=&geometry=&geometryType=esriGeometryPoint&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=POP100%2C+HU100%2C+BLKGRP&returnGeometry=false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson'
       start = Time.now      
@@ -73,7 +70,6 @@ class MapController < ApplicationController
       finish = Time.now
       puts (finish - start)
       restTime = restTime + (finish - start)
-
 
       # response = RestClient.get 'http://tigerweb.geo.census.gov/arcgis/rest/services/Census2010/Tracts_Blocks/MapServer/1/query?where=GEOID%3D484910208071&text=&objectIds=&time=&geometry=&geometryType=esriGeometryPoint&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=POP100%2C+HU100%2C+BLKGRP&returnGeometry=false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson'
       
