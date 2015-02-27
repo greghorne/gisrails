@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   get 'my_coordinates' => 'map#starting_coordinates' 
   get 'insert_iso' => 'map#insert_iso'
   post 'insert_iso_shape' => 'map#insert_iso_shape'
+  post 'create_drive_polygon' => 'map#create_drive_polygon'
   root 'map#show_map'
 
   # Example of regular route:

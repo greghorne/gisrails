@@ -10,6 +10,25 @@ class MapController < ApplicationController
 
   end
 
+  def create_drive_polygon
+
+    longitude = params[:longitude]
+    latitude = params[:latitude]
+    time = params[:time]
+
+    getString = 'https://route.st.nlp.nokia.com/routing/6.2/calculateisoline.json'
+    getString = getString + '?mode=fastest;car;traffic:disabled&start=' + latitude + ',' + longitude + '&time=' + time + '&app_id=hQG4ZX6W0D2sUfQJeb0t&app_code=R82WCNW4u11a93myPTaMpg'
+
+    response = RestClient.get getString
+
+    result = JSON.parse(response)
+    
+    render :json => {
+      result: result
+    }
+
+  end
+
 
   def insert_iso_shape
     conn = PGconn.open(
@@ -38,7 +57,7 @@ class MapController < ApplicationController
     selectString = 'select geoid10 as block_group_id, (st_area(st_intersection(user_polygons.geom, bg_2010.geom))/st_area(bg_2010.geom)) as user_polygon_percent_overlap from bg_2010, user_polygons where user_polygons.id = $1 and ST_INTERSECTS(user_polygons.geom, bg_2010.geom) order by geoid10;'
     result = conn.query(selectString, [rowID])
 
-    puts result.count.to_s + " Block Groups "
+    # puts result.count.to_s + " Block Groups "
 
     if (result.count == 0)
       render :json => {
@@ -107,7 +126,7 @@ class MapController < ApplicationController
 
 
   def insert_iso
-    puts params[:polygon]
+    # puts params[:polygon]
 
     render :json => {
       connection: 'success'

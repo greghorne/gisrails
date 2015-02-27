@@ -42,22 +42,23 @@ isoChrone.push("")
 isoChrone.push("")
 
 function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLayer) {
+
 		$.ajax({
-    	url: 'https://route.st.nlp.nokia.com/routing/6.2/calculateisoline.json',
-    	type: 'GET',
-    	datatype: 'jsonp',
-    	//data: 'mode=fastest;car;traffic:disabled&start=30.451005399999996, -97.6132245&time=PT0H10M&app_id=hQG4ZX6W0D2sUfQJeb0t&app_code=R82WCNW4u11a93myPTaMpg'
-		data: 'mode=fastest;car;traffic:disabled&start=' + latitude + ',' + longitude + '&time=' + time + '&app_id=hQG4ZX6W0D2sUfQJeb0t&app_code=R82WCNW4u11a93myPTaMpg'
+		    url: "/create_drive_polygon.json",
+		    type: "POST",
+		    data: {latitude: latitude,
+		    	   longitude: longitude,
+		    	   time: time}
+		}).done(function (result) {
+		//console.log(result)
 
-	}).done (function (result) {
-
-		// number of point in isoChrone
-		length = result.Response.isolines[0].value.length
+		// number of points in isoChrone
+		var length = result.result.Response.isolines[0].value.length
 
 		var isoChronePoints = [];
 		for (n= 0; n < length - 1; n++) {
 
-			valueSplit = result.Response.isolines[0].value[n].split(",")
+			valueSplit = result.result.Response.isolines[0].value[n].split(",")
 			isoChronePoints.push(L.latLng(valueSplit[0], valueSplit[1]))
 		}
 		isoChrone = L.polygon(isoChronePoints, color).addTo(map);
@@ -68,12 +69,9 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 		}
 
 		var geoJSON = L.polygon(isoChronePoints, color).toGeoJSON()
-	// console.log("===============")
-	// console.log(geoJSON)
-			geoJSON = geoJSON['geometry']
-	// console.log("===============")
-	// console.log(geoJSON)
+		geoJSON = geoJSON['geometry']
 		geoJSON = JSON.stringify(geoJSON)
+		
 		$.ajax({
 		    url: "/insert_iso_shape.json",
 		    type: "POST",
@@ -85,7 +83,8 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 		    alertify.success("<center>Population: " + population + " </br> Households: " + household + "</center>")
 		});
 	});
-};
+	};
+
 
 
 	////////////////////////////////////////////
@@ -356,12 +355,9 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 			isoChrone = L.polygon(isoChronePoints, {color: 'red'}).addTo(map);
 			/////////////////////////
 			var geoJSON = L.polygon(isoChronePoints, 'red').toGeoJSON()
-	console.log("===============")
-	console.log(geoJSON)
 			geoJSON = geoJSON['geometry']
-			console.log("===============")
-	console.log(geoJSON)
 			geoJSON = JSON.stringify(geoJSON)
+
 			$.ajax({
 			    url: "/insert_iso_shape.json",
 			    type: "POST",
