@@ -3,6 +3,8 @@ require 'pg'
 require 'rgeo/geo_json'
 require 'json'
 require 'eventmachine'
+require 'thread'
+require 'thwait'
 
 class MapController < ApplicationController
 
@@ -56,8 +58,8 @@ class MapController < ApplicationController
 
     selectString = 'select geoid10 as block_group_id, (st_area(st_intersection(user_polygons.geom, bg_2010.geom))/st_area(bg_2010.geom)) as user_polygon_percent_overlap from bg_2010, user_polygons where user_polygons.id = $1 and ST_INTERSECTS(user_polygons.geom, bg_2010.geom) order by geoid10;'
     result = conn.query(selectString, [rowID])
-
-    # puts result.count.to_s + " Block Groups "
+    puts "==============="
+    puts result.count.to_s + " Block Groups "
 
     if (result.count == 0)
       render :json => {
@@ -78,40 +80,59 @@ class MapController < ApplicationController
     totalPopulation = 0
     totalHousehold = 0
 
+    counter = 0
+    threads = []
+
     restTime = 0
+
+    start = Time.now()
+
     while (n < block_group_id.length) do
-      puts "Record: " + n.to_s + "   Block Group ID: " + block_group_id[n] + "   Percent Overlap: " + block_group_overlap[n]
+      # puts "Record: " + n.to_s + "   Block Group ID: " + block_group_id[n] + "   Percent Overlap: " + block_group_overlap[n]
 
       getString = 'http://tigerweb.geo.census.gov/arcgis/rest/services/Census2010/Tracts_Blocks/MapServer/1/'
       getString = getString + 'query?where=GEOID%3D' + block_group_id[n] + '&text=&objectIds=&time=&geometry=&geometryType=esriGeometryPoint&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=POP100%2C+HU100%2C+BLKGRP&returnGeometry=false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson'
-      start = Time.now      
-      response = RestClient.get getString
-      finish = Time.now
-      puts (finish - start)
-      restTime = restTime + (finish - start)
+      # start = Time.now  
 
-      # response = RestClient.get 'http://tigerweb.geo.census.gov/arcgis/rest/services/Census2010/Tracts_Blocks/MapServer/1/query?where=GEOID%3D484910208071&text=&objectIds=&time=&geometry=&geometryType=esriGeometryPoint&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=POP100%2C+HU100%2C+BLKGRP&returnGeometry=false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson'
-      
-      hash = JSON.parse response
-      features = hash["features"]
-      attributes = features[0]
-
-      # puts attributes["attributes"]["POP100"]
-      # puts attributes["attributes"]["HU100"]
-      tempPopulation = attributes["attributes"]["POP100"].to_f * block_group_overlap[n].to_f
-      tempHousehold = attributes["attributes"]["HU100"].to_f * block_group_overlap[n].to_f
-
-      totalPopulation = totalPopulation + tempPopulation
-      totalHousehold = totalHousehold + tempHousehold
-
+      threads[counter] = Thread.new {
+        Thread.current["response"] = RestClient.get getString 
+      }
+      sleep (0.05)
+      counter = counter + 1
       n = n + 1
-    end 
+    end
+
+    puts "Count: " + threads.length.to_s
+    n = 0
+    
+    threads.each { |response| response.join }
+
+    
+    puts "============="
+    threads.each do |response| 
+        # puts response["response"]
+        hash = JSON.parse response["response"].to_s
+        features = hash["features"];
+        attributes = features[0];
+        # puts attributes
+
+        tempPopulation = attributes["attributes"]["POP100"].to_f * block_group_overlap[n].to_f
+        tempHousehold = attributes["attributes"]["HU100"].to_f * block_group_overlap[n].to_f
+        # puts ""
+        # puts tempPopulation
+        # puts tempHousehold
+        totalPopulation = totalPopulation + tempPopulation
+        totalHousehold = totalHousehold + tempHousehold 
+
+        n = n + 1
+    end
+
+    nowTime = Time.now
+    puts "Total Time: " + (nowTime - start).to_s
     puts "==============="
-    puts "restTime: " + restTime.to_s
     puts "REST Calls: " + result.count.to_s
-    puts "Avg REST Call: " + (restTime / result.count).to_s
+    puts "Avg REST Call: " + ((nowTime - start) / result.count).to_s
     puts "==============="
-    puts ""
     puts "------------"
     puts "POP " + totalPopulation.to_f.floor.to_s
     puts "HU " + totalHousehold.to_f.floor.to_s

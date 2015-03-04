@@ -72,11 +72,14 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 		geoJSON = geoJSON['geometry']
 		geoJSON = JSON.stringify(geoJSON)
 		
+		alertify.success("Calcuating demographics...")
+		$("#loading").show();
 		$.ajax({
 		    url: "/insert_iso_shape.json",
 		    type: "POST",
 		    data: {polygon: geoJSON}
 		}).done(function (data) {
+			$("#loading").hide();
 			population = data["pop"]
 			household = data["hu"]
 
@@ -158,7 +161,7 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 		}).addTo(map).bindPopup('<center>Your approximate location<br>(More or less ' + location.coords.accuracy + '  metres)</center>');
 
 		if (map.hasLayer(isoChrone)) { 
-			console.log("IsoLayer Removed")
+			// console.log("IsoLayer Removed")
 			map.removeLayer(isoChrone) 
 		};
 
@@ -225,13 +228,13 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 	function geocodeAddress() {
 
 		var geocodeText = document.getElementById('geocode').value;
-		console.log(geocodeText)
+		// console.log(geocodeText)
 
 		geocoder = new google.maps.Geocoder()
 		geocoder.geocode( { 'address': geocodeText}, function(results, status) {
-			console.log(status)
+			// console.log(status)
 			if (status == "OK") {
-				console.log(results)
+				// console.log(results)
 				var longitude = results[0].geometry.location.B
 				var latitude = results[0].geometry.location.k
 				//console.log(latitude, longitude)
@@ -253,7 +256,7 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 
 
 		if (map.hasLayer(isoChrone)) { 
-			console.log("IsoLayer Removed")
+			// console.log("IsoLayer Removed")
 			map.removeLayer(isoChrone) 
 		};
 				createIsochrone(latitude, longitude, "PT0H05M", {color: 'red'}, true, true)
@@ -284,7 +287,7 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 
 		this._div.addEventListener('keypress', function() {
 			if (event.keyCode == 13) {
-				console.log(event)
+				// console.log(event)
 				geocodeAddress();
 			}
 		});
@@ -297,19 +300,19 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 	////////////////////////////////////////////
 	// this will get the bounds of the map on the initial page load
 	var bounds = map.getBounds();
-	console.log("Initial Bounds: ", bounds);
+	// console.log("Initial Bounds: ", bounds);
 	////////////////////////////////////////////
 
 	////////////////////////////////////////////
 	// this will subsequently get the bounds of the
 	// map on further map changes
-	map.on('moveend', function (e) {
-		console.log("")
-		console.log("Map Moved (New Bounds):")
-		console.log("Event: moveend", map.getBounds()); 
-		console.log("Zoom: ", map.getZoom())
-		console.log("Center: ", map.getCenter().lat, map.getCenter().lng)
-	});
+	// map.on('moveend', function (e) {
+	// 	console.log("")
+	// 	console.log("Map Moved (New Bounds):")
+	// 	console.log("Event: moveend", map.getBounds()); 
+	// 	console.log("Zoom: ", map.getZoom())
+	// 	console.log("Center: ", map.getCenter().lat, map.getCenter().lng)
+	// });
 	////////////////////////////////////////////
 
 
@@ -338,10 +341,10 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 		layerType = e.layerType;
 		layer = e.layer;
 		
-		console.log("Layer Type: ", layerType)
+		// console.log("Layer Type: ", layerType)
 
 			if (map.hasLayer(isoChrone)) { 
-				console.log("IsoLayer Removed")
+				// console.log("IsoLayer Removed")
 				map.removeLayer(isoChrone) 
 			};
 
@@ -349,7 +352,7 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 
 			var isoChronePoints = [];
 			for (n = 0; n < layer._latlngs.length; n++) {
-				console.log(layer._latlngs[n].lat, layer._latlngs[n].lng, "(lat/lng)")
+				// console.log(layer._latlngs[n].lat, layer._latlngs[n].lng, "(lat/lng)")
 				isoChronePoints.push(L.latLng(layer._latlngs[n].lat, layer._latlngs[n].lng))
 			}
 			isoChrone = L.polygon(isoChronePoints, {color: 'red'}).addTo(map);
@@ -357,12 +360,14 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 			var geoJSON = L.polygon(isoChronePoints, 'red').toGeoJSON()
 			geoJSON = geoJSON['geometry']
 			geoJSON = JSON.stringify(geoJSON)
-
+			alertify.success("Calcuating demographics...")
+			$("#loading").show();
 			$.ajax({
 			    url: "/insert_iso_shape.json",
 			    type: "POST",
 			    data: {polygon: geoJSON}
 			}).done(function (data) {
+				$("#loading").hide();
 				population = data["pop"]
 				household = data["hu"]
 			    alertify.success("<center>Population: " + population + " </br> Households: " + household + "</center>")
@@ -385,7 +390,7 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 			}).addTo(map).bindPopup('<center>Location: ' + latitude + ', ' + longitude + ' (lat/lng)</center>');
 
 			if (map.hasLayer(isoChrone)) { 
-				console.log("IsoLayer Removed")
+				// console.log("IsoLayer Removed")
 				map.removeLayer(isoChrone) 
 			};
 
