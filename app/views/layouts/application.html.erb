@@ -234,8 +234,8 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 		geocoder.geocode( { 'address': geocodeText}, function(results, status) {
 			// console.log(status)
 			if (status == "OK") {
-				// console.log(results)
-				var longitude = results[0].geometry.location.B
+				console.log(results)
+				var longitude = results[0].geometry.location.D
 				var latitude = results[0].geometry.location.k
 				//console.log(latitude, longitude)
 
