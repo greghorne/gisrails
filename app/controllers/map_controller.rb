@@ -3,8 +3,7 @@ require 'pg'
 require 'rgeo/geo_json'
 require 'json'
 require 'eventmachine'
-.2require 'thread'
-require 'thwait'
+require 'thread'
 
 class MapController < ApplicationController
 
@@ -99,7 +98,7 @@ class MapController < ApplicationController
       threads[counter] = Thread.new {
         Thread.current["response"] = RestClient.get getString 
       }
-      sleep (0.1)
+      sleep (0.05)
       counter = counter + 1
       n = n + 1
     end
