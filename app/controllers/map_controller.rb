@@ -105,7 +105,7 @@ puts "after conn"
       # The following sleep value determines the sleep time between each
       # threaded call to the Census Bureau's server.
       #
-      sleep (0.2)
+      # sleep (0.2)
 
       counter = counter + 1
       n = n + 1
@@ -119,18 +119,18 @@ puts "threads combined..."
     puts "============="
     threads.each do |response| 
         puts "thread " + n.to_s
-        # puts response["response"]
+        puts response["response"]
         hash = JSON.parse response["response"].to_s
 
         features = hash["features"];
         attributes = features[0];
-        # puts attributes
+        puts attributes
 
         tempPopulation = attributes["attributes"]["POP100"].to_f * block_group_overlap[n].to_f
         tempHousehold = attributes["attributes"]["HU100"].to_f * block_group_overlap[n].to_f
-        # puts ""
-        # puts tempPopulation
-        # puts tempHousehold
+        puts ""
+        puts tempPopulation
+        puts tempHousehold
         totalPopulation = totalPopulation + tempPopulation
         totalHousehold = totalHousehold + tempHousehold 
 
