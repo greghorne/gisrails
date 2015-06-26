@@ -109,7 +109,7 @@ puts "after conn"
       # The following sleep value determines the sleep time between each
       # threaded call to the Census Bureau's server.
       #
-      sleep (0.1)
+      sleep (0.2)
 
       counter = counter + 1
       n = n + 1
