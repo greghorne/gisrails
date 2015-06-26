@@ -91,9 +91,13 @@ puts "after conn"
     while (n < block_group_id.length) do
       # puts "Record: " + n.to_s + "   Block Group ID: " + block_group_id[n] + "   Percent Overlap: " + block_group_overlap[n]
 
-      getString = 'http://tigerweb.geo.census.gov/arcgis/rest/services/Census2010/Tracts_Blocks/MapServer/1/'
-      getString = getString + 'query?where=GEOID%3D' + block_group_id[n] + '&text=&objectIds=&time=&geometry=&geometryType=esriGeometryPoint&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=POP100%2C+HU100%2C+BLKGRP&returnGeometry=false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson'
+      # getString = 'http://tigerweb.geo.census.gov/arcgis/rest/services/Census2010/Tracts_Blocks/MapServer/1/'
+      # getString = getString + 'query?where=GEOID%3D' + block_group_id[n] + '&text=&objectIds=&time=&geometry=&geometryType=esriGeometryPoint&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=POP100%2C+HU100%2C+BLKGRP&returnGeometry=false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson'
 
+      getString = 'http://tigerweb.geo.census.gov/arcgis/rest/services/Census2010/Tracts_Blocks/MapServer/1/'
+      getString = getString + 'query?where=GEOID%3D' + block_group_id[n] + '&outFields=POP100%2C+HU100%2C+BLKGRP&returnGeometry=false'
+      getString = getString + '&returnIdsOnly=false&returnCountOnly=false&returnZ=false&returnM=false&returnDistinctValues=false&f=pjson'
+      # getString = getString + '?key=3ff5f0b1013cb070e057988b83453644ca198c34'
       # puts getString + " " + counter.to_s
       # puts ""
 
@@ -105,7 +109,7 @@ puts "after conn"
       # The following sleep value determines the sleep time between each
       # threaded call to the Census Bureau's server.
       #
-      # sleep (0.2)
+      sleep (0.1)
 
       counter = counter + 1
       n = n + 1
@@ -113,7 +117,9 @@ puts "after conn"
 
     puts "Count: " + threads.length.to_s
     n = 0
-puts "threads combine"
+puts "threads join"
+    threads.join
+puts 'threads combining'
     threads.each { |response| response.join }
 puts "threads combined..."
     puts "============="
