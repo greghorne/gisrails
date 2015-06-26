@@ -38,7 +38,7 @@ class MapController < ApplicationController
       :port => 5432,
       :user => 'master',
       :password => 'mastermaster')
-
+puts "after conn"
     ########################################################
     # having to strip some characters from GeoJSON string prior
     # to insert into DB
@@ -49,8 +49,10 @@ class MapController < ApplicationController
     polygon.chop!
     polygon[0] = ''
 
+# puts polygon
+
     insertString = 'insert into user_polygons (name, geom) VALUES ($1, ST_SetSRID(ST_GeomFromGeoJSON($2), 4269)) RETURNING id'
-    result = conn.query(insertString, ['Test Insert', polygon])
+    result = conn.query(insertString, [' ', polygon])
 
     row = result.first
     rowID = row['id']
@@ -91,28 +93,35 @@ class MapController < ApplicationController
 
       getString = 'http://tigerweb.geo.census.gov/arcgis/rest/services/Census2010/Tracts_Blocks/MapServer/1/'
       getString = getString + 'query?where=GEOID%3D' + block_group_id[n] + '&text=&objectIds=&time=&geometry=&geometryType=esriGeometryPoint&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=POP100%2C+HU100%2C+BLKGRP&returnGeometry=false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson'
-      # start = Time.now  
-      puts getString
-      puts ""
+
+      # puts getString + " " + counter.to_s
+      # puts ""
 
       threads[counter] = Thread.new {
         Thread.current["response"] = RestClient.get getString 
       }
-      sleep (0.05)
+
+      # 
+      # The following sleep value determines the sleep time between each
+      # threaded call to the Census Bureau's server.
+      #
+      sleep (0.2)
+
       counter = counter + 1
       n = n + 1
     end
 
     puts "Count: " + threads.length.to_s
     n = 0
-    
+puts "threads combine"
     threads.each { |response| response.join }
-
-    
+puts "threads combined..."
     puts "============="
     threads.each do |response| 
+        puts "thread " + n.to_s
         # puts response["response"]
         hash = JSON.parse response["response"].to_s
+
         features = hash["features"];
         attributes = features[0];
         # puts attributes

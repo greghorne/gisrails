@@ -5,10 +5,10 @@
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
-  <script src="https://maps.google.com/maps/api/js?v=3&sensor=false"></script>
+  	<script src="https://maps.google.com/maps/api/js?v=3&sensor=false"></script>
 	<script src="http://js.api.here.com/v3/3.0/mapsjs-core.js"
           	type="text/javascript" charset="utf-8"></script>
-          <script src="http://js.api.here.com/v3/3.0/mapsjs-service.js"
+    <script src="http://js.api.here.com/v3/3.0/mapsjs-service.js"
           	type="text/javascript" charset="utf-8"></script>  
 	<style type="text/css">
 	
@@ -152,7 +152,7 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 
 		// pan and zoom to location
 		var myLatLng = L.latLng(location.coords.latitude, location.coords.longitude);
-		//map.setView(myLatLng, 12)   // change to 16
+		map.setView(myLatLng, 12)   // change to 16
 
 		// add marker to map for initial location
 		marker = L.marker([latitude, longitude], {
@@ -165,9 +165,9 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 			map.removeLayer(isoChrone) 
 		};
 
-		createIsochrone(latitude, longitude, "PT0H05M", {color: 'red'}, true, true)
+		// createIsochrone(latitude, longitude, "PT0H05M", {color: 'red'}, true, true)
 
-		alertify.success("Drive Time Polygons Created")
+		// alertify.success("Drive Time Polygons Created")
 	};
 
 	function error(error) {
@@ -235,13 +235,13 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 			// console.log(status)
 			if (status == "OK") {
 				console.log(results)
-				var longitude = results[0].geometry.location.D
-				var latitude = results[0].geometry.location.k
-				//console.log(latitude, longitude)
+				var longitude = results[0].geometry.location.F
+				var latitude = results[0].geometry.location.A
+				console.log(latitude, longitude)
 
 				var myLatLng = L.latLng(latitude, longitude);
 				
-				//map.setView(myLatLng, 16)
+				map.setView(myLatLng, 12)
 				var foundAddress = results[0].formatted_address;
 
 				// add marker to map
@@ -254,14 +254,16 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 
 				alertify.success("Geocoded: " + foundAddress)
 
+			//
+			// HERE mapping trial account expired... no more isochrone support
+			//
+			// if (map.hasLayer(isoChrone)) { 
+			// 	// console.log("IsoLayer Removed")
+			// 	map.removeLayer(isoChrone) 
+			// };
+			// 	createIsochrone(latitude, longitude, "PT0H05M", {color: 'red'}, true, true)
 
-		if (map.hasLayer(isoChrone)) { 
-			// console.log("IsoLayer Removed")
-			map.removeLayer(isoChrone) 
-		};
-				createIsochrone(latitude, longitude, "PT0H05M", {color: 'red'}, true, true)
-
-				alertify.success("Drive Time Polygons Created")
+			// 	alertify.success("Drive Time Polygons Created")
 			} else {
 				alertify.error("Unable to geocode")
 			}
@@ -329,6 +331,7 @@ function createIsochrone(latitude, longitude, time, color, setBounds, clearIsoLa
 	    edit: { featureGroup: tempDrawn }, 
 	    draw: { polyline: false,
 	    		circle: false,
+	    		marker: false,
 				edit: { edit: false }
 
 			  }
