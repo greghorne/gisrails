@@ -6,11 +6,11 @@
 #
 default: &default
   adapter: postgresql
-  host: aws-gis.cot74qrzzmqu.us-west-2.rds.amazonaws.com
-  dbname: awsgis
+  host: kamiuma.remotewebaccess.com
+  dbname: block2010
   port: 5432
-  user: master
-  password: mastermaster
+  user: postgres
+  password: postgres
 
   # host: aws-gis.cot74qrzzmqu.us-west-2.rds.amazonaws.com
   # user: master
